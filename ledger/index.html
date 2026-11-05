@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forensic deployment record</title>
+<meta name="description" content="Twelve contracts, every transaction, every code hash — and the failures as well as the successes.">
+<style>
+:root{color-scheme:dark;--bg:#08080d;--card:#12121b;--line:#242435;--fg:#e9e9f2;
+--dim:#8b8ba6;--accent:#6366f1;--ok:#4ade80;--warn:#fbbf24;--err:#f87171}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font:15px/1.6 ui-sans-serif,system-ui,sans-serif;
+background:radial-gradient(900px 480px at 50% -10%,#191930 0%,var(--bg) 65%);color:var(--fg);
+display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+.wrap{width:min(720px,100%)}h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--dim);font-size:13px;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+h2{font-size:13px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim)}
+.row{display:flex;justify-content:space-between;gap:16px;font-size:13.5px;padding:7px 0;
+border-bottom:1px solid rgba(255,255,255,.04)}.row:last-child{border:0}
+.row span{color:var(--dim);flex:0 0 auto}.row b{font-weight:500;text-align:right;
+font-family:ui-monospace,monospace;word-break:break-all}
+p{margin:0 0 10px;font-size:14px}ul{margin:0;padding-left:18px;font-size:14px}
+li{margin-bottom:6px}code{font-family:ui-monospace,monospace;font-size:12px;color:#b9b9d9;
+background:#0d0d15;padding:2px 6px;border-radius:4px}
+a{color:var(--accent);text-decoration:none}.note{font-size:12px;color:var(--dim);margin-top:12px;line-height:1.6}
+.tag{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:4px;background:#1c1533;
+color:#b9a9e9;margin-left:8px;vertical-align:middle}
+.v{font-family:ui-monospace,monospace;font-size:12px;padding:2px 8px;border-radius:5px;background:#0d2f1d;color:var(--ok)}
+.v.w{background:#3a2e0d;color:var(--warn)}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+nav a{font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;color:var(--dim)}
+nav a:hover{border-color:var(--accent);color:var(--fg)}
+</style></head><body><div class="wrap">
+<h1>Forensic deployment record<span class="tag">LEDGER</span></h1><p class="sub">Twelve contracts, every transaction, every code hash — and the failures as well as the successes.</p>
+<nav><a href="/">Hub</a><a href="/quantum/">Quantum</a><a href="/kernel/">Kernel</a><a href="/scp144/">SCP-144</a><a href="/zedei/">zedei</a><a href="/unog/">unog</a><a href="/bridge/">Bridge</a><a href="/governance/">Governance</a><a href="/outposts/">Outposts</a><a href="/logic/">Logic</a><a href="/builders/">Builders</a><a href="/ledger/">Ledger</a></nav>
+<section class="card"><h2>What is recorded</h2><ul><li>12 contract accounts with code hash, size, balance and key count</li>
+  <li>every transaction submitted, with its outcome</li>
+  <li>every defect found, followed by the fix and the transaction proving it</li>
+  <li>QA gates with actual numbers, not a summary written afterwards</li></ul></section>
+<section class="card"><h2>QA numbers</h2><div class="row"><span>Host suite, ASan + UBSan</span><b>1,858,226 checks, 0 failed</b></div><div class="row"><span>VM gate — 26 scenarios</span><b>QC: PASS, 0 wrong</b></div><div class="row"><span>Strict wasm MVP</span><b>807 bodies, 990,140 code bytes</b></div><div class="row"><span>Determinism</span><b>plain and -j16 byte-identical</b></div><div class="row"><span>Floating point in code</span><b>none</b></div></section>
+<section class="card"><h2>The provenance chain</h2><p><code>QC log recorded : 8f3936888224eee7…</code><br>
+  <code>published file  : 8f3936888224eee7…</code><br>
+  <code>base58 of that  : Ae5uDVYKhZpwgCBDTcSQGk26azY4ytzBH69kUL2FD8y5</code><br>
+  <code>chain reports   : Ae5uDVYKhZpwgCBDTcSQGk26azY4ytzBH69kUL2FD8y5</code></p>
+  <p>A test log written <strong>before</strong> deployment, a file published <strong>after</strong> it,
+  and the live chain all carry the same value.</p>
+  <p class="note">A deployment record with no failures in it is either very young or not entirely true.
+  This one has the failures.</p></section>
+<p class="note" style="text-align:center;margin-top:20px">
+Sealed core · zero access keys · <a href="https://github.com/sykomiked/zedec-zxv-deployment" target="_blank" rel="noopener">verify the source</a>
+</p></div></body></html>

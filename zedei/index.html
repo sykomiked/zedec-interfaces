@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>zedei.near — automation and interface</title>
+<meta name="description" content="Content-addressed blobs, a contract factory, and the callable surface front-ends build against.">
+<style>
+:root{color-scheme:dark;--bg:#08080d;--card:#12121b;--line:#242435;--fg:#e9e9f2;
+--dim:#8b8ba6;--accent:#6366f1;--ok:#4ade80;--warn:#fbbf24;--err:#f87171}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font:15px/1.6 ui-sans-serif,system-ui,sans-serif;
+background:radial-gradient(900px 480px at 50% -10%,#191930 0%,var(--bg) 65%);color:var(--fg);
+display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+.wrap{width:min(720px,100%)}h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--dim);font-size:13px;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+h2{font-size:13px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim)}
+.row{display:flex;justify-content:space-between;gap:16px;font-size:13.5px;padding:7px 0;
+border-bottom:1px solid rgba(255,255,255,.04)}.row:last-child{border:0}
+.row span{color:var(--dim);flex:0 0 auto}.row b{font-weight:500;text-align:right;
+font-family:ui-monospace,monospace;word-break:break-all}
+p{margin:0 0 10px;font-size:14px}ul{margin:0;padding-left:18px;font-size:14px}
+li{margin-bottom:6px}code{font-family:ui-monospace,monospace;font-size:12px;color:#b9b9d9;
+background:#0d0d15;padding:2px 6px;border-radius:4px}
+a{color:var(--accent);text-decoration:none}.note{font-size:12px;color:var(--dim);margin-top:12px;line-height:1.6}
+.tag{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:4px;background:#1c1533;
+color:#b9a9e9;margin-left:8px;vertical-align:middle}
+.v{font-family:ui-monospace,monospace;font-size:12px;padding:2px 8px;border-radius:5px;background:#0d2f1d;color:var(--ok)}
+.v.w{background:#3a2e0d;color:var(--warn)}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+nav a{font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;color:var(--dim)}
+nav a:hover{border-color:var(--accent);color:var(--fg)}
+</style></head><body><div class="wrap">
+<h1>zedei.near — automation and interface<span class="tag">ZEDEI</span></h1><p class="sub">Content-addressed blobs, a contract factory, and the callable surface front-ends build against.</p>
+<nav><a href="/">Hub</a><a href="/quantum/">Quantum</a><a href="/kernel/">Kernel</a><a href="/scp144/">SCP-144</a><a href="/zedei/">zedei</a><a href="/unog/">unog</a><a href="/bridge/">Bridge</a><a href="/governance/">Governance</a><a href="/outposts/">Outposts</a><a href="/logic/">Logic</a><a href="/builders/">Builders</a><a href="/ledger/">Ledger</a></nav>
+<section class="card"><h2>What it is</h2><div class="row"><span>Account</span><b>zedei.near</b></div><div class="row"><span>Code hash</span><b>CRZgm89Yo8JsU6WgFjFmkrU8BRDZfMvieKQ2hozDLwjZ</b></div><div class="row"><span>Size</span><b>61,325 bytes</b></div><div class="row"><span>Access keys</span><b><span class="v">0 — sealed</span></b></div><div class="row"><span>Operator build</span><b>36n9.zedei.near — 396,064 bytes</b></div><div class="row"><span>Desk outpost</span><b>outpost.jollydragonroger.near — same binary</b></div></section>
+<section class="card"><h2>Why this layer exists</h2><p>The sealed core deliberately exposes no convenience surface. It is a virtual machine:
+  correct, minimal, and hostile to casual use.</p>
+  <p>Putting ergonomics in a separate contract means the core can stay sealed forever while the
+  interface layer evolves — and if the interface is wrong, it can be replaced without touching the
+  thing holding the money.</p>
+  <p class="note">That separation is the reason <code>unog.near</code> can have zero access keys and
+  still be usable.</p></section>
+<section class="card"><h2>Same binary, two accounts</h2><p><code>zedei.near</code> and <code>outpost.jollydragonroger.near</code> share a SHA-256
+  (<code>a9bb7408…</code>). That is deliberate: the desk outpost runs the same interface code, so
+  behaviour cannot drift between them.</p></section>
+<p class="note" style="text-align:center;margin-top:20px">
+Sealed core · zero access keys · <a href="https://github.com/sykomiked/zedec-zxv-deployment" target="_blank" rel="noopener">verify the source</a>
+</p></div></body></html>

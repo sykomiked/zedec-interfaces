@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Period finding — on-chain quantum mathematics</title>
+<meta name="description" content="Exact multiplicative order, Shor post-processing and cycle detection, as implemented in the sealed core's OP_QPERIOD.">
+<style>
+  :root{color-scheme:dark;--bg:#08080d;--card:#12121b;--line:#242435;--fg:#e9e9f2;
+        --dim:#8b8ba6;--accent:#8b5cf6;--ok:#4ade80;--warn:#fbbf24;--err:#f87171}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font:15px/1.6 ui-sans-serif,system-ui,sans-serif;
+       background:radial-gradient(900px 500px at 50% -10%,#1c1533 0%,var(--bg) 65%);
+       color:var(--fg);display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+  .wrap{width:min(680px,100%)}
+  header{margin-bottom:20px}
+  h1{font-size:20px;margin:0 0 4px;letter-spacing:.2px}
+  .sub{color:var(--dim);font-size:13px;margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+  h2{font-size:14px;margin:0 0 12px;color:var(--fg);font-weight:600}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  label{display:block;font-size:11.5px;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+  input{width:100%;padding:11px;font-size:15px;font-family:ui-monospace,monospace;
+        background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;outline:none}
+  input:focus{border-color:var(--accent)}
+  button{padding:11px 16px;font-size:13.5px;font-weight:600;border:0;border-radius:8px;
+         background:var(--accent);color:#fff;cursor:pointer;margin-top:12px}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--dim)}
+  button:hover{opacity:.9}
+  .row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;
+       border-bottom:1px solid rgba(255,255,255,.03)}
+  .row:last-child{border:0}
+  .row span{color:var(--dim)}
+  .row b{font-family:ui-monospace,monospace;font-weight:500}
+  .v{font-family:ui-monospace,monospace;font-size:12px;padding:2px 8px;border-radius:5px}
+  .v.TRUE{background:#0d2f1d;color:var(--ok)}
+  .v.FALSE{background:#3a1212;color:var(--err)}
+  .v.NEITHER,.v.BOTH{background:#3a2e0d;color:var(--warn)}
+  .note{font-size:11.5px;color:var(--dim);line-height:1.6;margin-top:12px}
+  code{font-family:ui-monospace,monospace;font-size:11.5px;color:#b9b9d9}
+  .out{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:14px;margin-top:14px}
+  .big{font-size:22px;font-family:ui-monospace,monospace;color:var(--fg)}
+  a{color:var(--accent);text-decoration:none}
+  .tag{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:4px;
+       background:#1c1533;color:#b9a9e9;margin-left:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Period finding <span class="tag">OP_QPERIOD</span></h1>
+    <p class="sub">Exact multiplicative order, Shor post-processing, and cycle detection —
+       the classical half of a quantum attack, implemented in a sealed contract.</p>
+  </header>
+
+  <section class="card">
+    <h2>The honest framing</h2>
+    <div class="note" style="margin-top:0">
+      <strong style="color:var(--fg)">The contract never runs a quantum computer.</strong>
+      It does the part that a quantum computer would be used for, but exactly: find the
+      period <code>r</code> of <code>a</code> mod <code>N</code>, verify it is minimal,
+      then run Shor's classical post-processing to factor <code>N</code>.
+      <br><br>
+      This is a <em>defensive</em> primitive. It proves a modulus is broken — which is
+      what you want to know about a legacy chain before you trust it.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Try it — exact, in your browser</h2>
+    <div class="grid">
+      <div><label for="N">Modulus N</label><input id="N" value="15" inputmode="numeric"></div>
+      <div><label for="a">Base a</label><input id="a" value="2" inputmode="numeric"></div>
+    </div>
+    <button id="run">Verify and factor</button>
+    <button class="ghost" id="rand">Random base</button>
+    <div class="out" id="out" style="display:none"></div>
+    <div class="note">
+      Bounds match the contract: <code>r ≤ 2²⁴</code>. Arithmetic is BigInt, deterministic,
+      no floating point — the same constraints the on-chain implementation works under.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Boot self-check</h2>
+    <div id="boot" class="note">running…</div>
+    <div class="note">
+      The contract proves this machinery at <code>gc_boot()</code> before any transaction
+      can run, and dies on failure. A cryptographic module that starts unverified is a
+      liability, not a feature.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>What it costs on-chain</h2>
+    <div class="row"><span>VERIFY</span><b>13.51 Tgas <span style="color:var(--ok)">74% left</span></b></div>
+    <div class="row"><span>FACTOR</span><b>12.16 Tgas <span style="color:var(--ok)">76% left</span></b></div>
+    <div class="row"><span>CYCLE</span><b>12.14 Tgas <span style="color:var(--ok)">77% left</span></b></div>
+    <div class="row"><span>qperiod view</span><b>1.40 Tgas <span style="color:var(--ok)">97% left</span></b></div>
+    <div class="note">
+      Measured under <code>nearrun</code>, NEAR's own VM, against a 51.7 Tgas frame.
+      A gate fails the build if any op exceeds 30 Tgas.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Live on mainnet</h2>
+    <div class="row"><span>Operation</span><b>OP_QPERIOD (238)</b></div>
+    <div class="row"><span>Contract</span><b>unog.near</b></div>
+    <div class="row"><span>Proof transaction</span><b><a href="https://nearblocks.io/txns/EkCfqYJsVZpTJfVseVNZbn539JFDsTr8NHopccUwpw8JH" target="_blank" rel="noopener">EkCfqYJs…</a></b></div>
+    <div class="row"><span>Verdict returned</span><b><span class="v TRUE">TRUE</span></b></div>
+    <div class="note">
+      <code>{"kind":"order","modulus":15,"base":2,"period":4,"order":4}</code> — the
+      order of 2 mod 15 is 4, verified on-chain and read back by view.
+    </div>
+  </section>
+
+  <p class="note" style="text-align:center">
+    Sealed core · zero access keys ·
+    <a href="https://github.com/sykomiked/zedec-zxv-deployment" target="_blank" rel="noopener">verify the implementation</a>
+  </p>
+</div>
+
+<script type="module">
+import { verify, factor, bootSelfCheck, gcd } from './quantum.mjs';
+
+const $ = id => document.getElementById(id);
+const badge = v => `<span class="v ${v}">${v}</span>`;
+
+function run() {
+  const N = $('N').value.trim(), a = $('a').value.trim();
+  const out = $('out');
+  out.style.display = 'block';
+  try {
+    const v = verify(a, N);
+    let html = `
+      <div class="row"><span>gcd(a, N)</span><b>${gcd(BigInt(a), BigInt(N))}</b></div>
+      <div class="row"><span>VERIFY</span><b>${badge(v.verdict)}</b></div>
+      <div class="row"><span>order r</span><b class="big">${v.verdict === 'TRUE' ? v.order : '—'}</b></div>`;
+    if (v.reason) html += `<div class="row"><span>reason</span><b style="font-family:inherit">${v.reason}</b></div>`;
+    if (v.checks?.length) {
+      html += `<div class="note" style="margin-top:10px"><strong>minimality checks</strong><br>` +
+        v.checks.map(c => `a<sup>r/${c.prime}</sup> mod N = ${c['a^(r/p) mod N']} ${c.passes ? '≠ 1 ✓' : '= 1 ✗'}`).join('<br>') +
+        `</div>`;
+    }
+    if (v.verdict === 'TRUE' && v.order % 2n === 0n) {
+      const f = factor(a, N, v.order);
+      html += `<div class="row" style="margin-top:10px"><span>FACTOR</span><b>${badge(f.verdict)}</b></div>`;
+      html += `<div class="row"><span>a<sup>r/2</sup> mod N</span><b>${f['a^(r/2) mod N'] ?? '—'}</b></div>`;
+      html += `<div class="row"><span>factors</span><b class="big">${f.factors?.length ? f.factors.join(' × ') : '—'}</b></div>`;
+      if (f.reason) html += `<div class="row"><span>reason</span><b style="font-family:inherit">${f.reason}</b></div>`;
+    } else if (v.verdict === 'TRUE') {
+      html += `<div class="row" style="margin-top:10px"><span>FACTOR</span><b>${badge('NEITHER')}</b></div>
+               <div class="row"><span>reason</span><b style="font-family:inherit">r is odd — try another base</b></div>`;
+    }
+    out.innerHTML = html;
+  } catch (e) {
+    out.innerHTML = `<span class="v FALSE">ERROR</span> ${e.message}`;
+  }
+}
+
+$('run').addEventListener('click', run);
+$('rand').addEventListener('click', () => {
+  const N = BigInt($('N').value || '15');
+  if (N < 3n) return;
+  let a = 2n + BigInt(Math.floor(Math.random() * 100)) % (N - 2n);
+  $('a').value = a.toString();
+  run();
+});
+
+const b = bootSelfCheck();
+$('boot').innerHTML =
+  `<div class="row"><span>verify — order of 2 mod 15</span><b>r = ${b.verify.order} ${badge(b.verify.verdict)} ${b.verify.pass ? '✓' : '✗'}</b></div>` +
+  `<div class="row"><span>factor — 15 =</span><b>${b.factor.factors.join(' × ')} ${b.factor.pass ? '✓' : '✗'}</b></div>` +
+  `<div class="row"><span>cycle — μ, λ</span><b>μ=${b.cycle.mu} λ=${b.cycle.lambda} ${b.cycle.pass ? '✓' : '✗'}</b></div>` +
+  `<div class="row"><span>all</span><b>${b.allPass ? badge('TRUE') : badge('FALSE')}</b></div>`;
+
+run();
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TIAMAT (PQOS) — no mint authority</title>
+<meta name="description" content="A 24-decimal NEP-141 token issued only when someone deposits NEAR collateral.">
+<style>
+:root{color-scheme:dark;--bg:#08080d;--card:#12121b;--line:#242435;--fg:#e9e9f2;
+--dim:#8b8ba6;--accent:#6366f1;--ok:#4ade80;--warn:#fbbf24;--err:#f87171}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font:15px/1.6 ui-sans-serif,system-ui,sans-serif;
+background:radial-gradient(900px 480px at 50% -10%,#191930 0%,var(--bg) 65%);color:var(--fg);
+display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+.wrap{width:min(720px,100%)}h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--dim);font-size:13px;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+h2{font-size:13px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim)}
+.row{display:flex;justify-content:space-between;gap:16px;font-size:13.5px;padding:7px 0;
+border-bottom:1px solid rgba(255,255,255,.04)}.row:last-child{border:0}
+.row span{color:var(--dim);flex:0 0 auto}.row b{font-weight:500;text-align:right;
+font-family:ui-monospace,monospace;word-break:break-all}
+p{margin:0 0 10px;font-size:14px}ul{margin:0;padding-left:18px;font-size:14px}
+li{margin-bottom:6px}code{font-family:ui-monospace,monospace;font-size:12px;color:#b9b9d9;
+background:#0d0d15;padding:2px 6px;border-radius:4px}
+a{color:var(--accent);text-decoration:none}.note{font-size:12px;color:var(--dim);margin-top:12px;line-height:1.6}
+.tag{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:4px;background:#1c1533;
+color:#b9a9e9;margin-left:8px;vertical-align:middle}
+.v{font-family:ui-monospace,monospace;font-size:12px;padding:2px 8px;border-radius:5px;background:#0d2f1d;color:var(--ok)}
+.v.w{background:#3a2e0d;color:var(--warn)}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+nav a{font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;color:var(--dim)}
+nav a:hover{border-color:var(--accent);color:var(--fg)}
+</style></head><body><div class="wrap">
+<h1>TIAMAT (PQOS) — no mint authority<span class="tag">TOKEN</span></h1><p class="sub">A 24-decimal NEP-141 token issued only when someone deposits NEAR collateral.</p>
+<nav><a href="/">Hub</a><a href="/quantum/">Quantum</a><a href="/kernel/">Kernel</a><a href="/scp144/">SCP-144</a><a href="/zedei/">zedei</a><a href="/unog/">unog</a><a href="/bridge/">Bridge</a><a href="/governance/">Governance</a><a href="/outposts/">Outposts</a><a href="/logic/">Logic</a><a href="/builders/">Builders</a><a href="/ledger/">Ledger</a></nav>
+<section class="card"><h2>What it is</h2><div class="row"><span>Contract</span><b>unog.near</b></div><div class="row"><span>Symbol</span><b>PQOS</b></div><div class="row"><span>Decimals</span><b>24</b></div><div class="row"><span>Supply</span><b>61.470008027182581764720275</b></div><div class="row"><span>Admin mint</span><b><span class="v">does not exist</span></b></div></section>
+<section class="card"><h2>The mechanism</h2><p>There was no premine, no ICO, no private sale, no team allocation, no treasury, no
+  emissions. Every PQOS in existence was created by someone depositing NEAR.</p>
+  <p><code>backing per new TIAMAT = phi^(21 × supply / cap) NEAR</code></p>
+  <p>Because the exponent rises with supply, collateral per token rises monotonically. Issuance is
+  bounded by collateral, not by time. Redemption burns the token and returns a pro-rata slice of the
+  whole reserve.</p></section>
+<section class="card"><h2>The thing everyone gets wrong</h2><p><strong>Minting credits an internal GRIDCHAIN account, not a wallet.</strong></p>
+  <p><code>deposit  →  internal balance</code><br><code>export   →  NEP-141 wallet</code></p>
+  <p class="note">A user who mints and sees nothing has not lost anything — the tokens are in the
+  ledger, one export away.</p></section>
+<section class="card"><h2>Trade</h2><p>Ref Finance pool 8992, PQOS/wNEAR — <a href="https://app.ref.finance/#/pools/8992"
+  target="_blank" rel="noopener">open the pool</a>.</p>
+  <p class="note">Liquidity is thin. The pair is real; the depth is not there yet. Saying so is more
+  useful than implying otherwise.</p></section>
+<p class="note" style="text-align:center;margin-top:20px">
+Sealed core · zero access keys · <a href="https://github.com/sykomiked/zedec-zxv-deployment" target="_blank" rel="noopener">verify the source</a>
+</p></div></body></html>

@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZEDEC/ZXV — interface</title>
+<meta name="description" content="Mint, redeem, bridge and inspect TIAMAT (PQOS) on NEAR.">
+<style>
+  :root{color-scheme:dark;--bg:#0a0a0f;--card:#13131c;--line:#252536;--fg:#e9e9f2;
+        --dim:#8b8ba6;--accent:#6366f1;--ok:#4ade80;--warn:#fbbf24;--err:#f87171}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font:15px/1.55 ui-sans-serif,system-ui,sans-serif;
+       background:radial-gradient(1100px 500px at 50% -10%,#191930 0%,var(--bg) 60%);
+       color:var(--fg);display:flex;flex-direction:column;align-items:center;padding:24px 16px}
+  .wrap{width:min(560px,100%)}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+  .brand{font-size:17px;font-weight:600;letter-spacing:.3px}
+  .brand span{color:var(--dim);font-weight:400}
+  #who{font-size:12px;color:var(--dim);font-family:ui-monospace,monospace}
+  nav{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+  nav button{flex:1;min-width:76px;padding:9px 6px;font-size:12.5px;background:transparent;
+             color:var(--dim);border:1px solid var(--line);border-radius:8px;cursor:pointer}
+  nav button.on{background:var(--card);color:var(--fg);border-color:var(--accent)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  h2{font-size:15px;margin:0 0 4px}
+  .sub{font-size:12.5px;color:var(--dim);margin:0 0 16px}
+  .row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0}
+  .row b{font-weight:500;font-variant-numeric:tabular-nums}
+  .row span{color:var(--dim)}
+  hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+  label{display:block;font-size:12px;color:var(--dim);margin:14px 0 6px}
+  input,select{width:100%;padding:12px;font-size:16px;background:var(--bg);color:var(--fg);
+        border:1px solid var(--line);border-radius:9px;outline:none}
+  input:focus,select:focus{border-color:var(--accent)}
+  button.go{width:100%;padding:13px;font-size:14.5px;font-weight:600;border:0;border-radius:9px;
+        background:var(--accent);color:#fff;cursor:pointer;margin-top:16px}
+  button.go:disabled{background:#222234;color:#5a5a75;cursor:not-allowed}
+  .banner{font-size:12.5px;padding:11px;border-radius:8px;margin-top:12px;display:none;
+          border:1px solid var(--line);background:var(--bg);line-height:1.5}
+  .banner.show{display:block}
+  .banner.ok{border-color:#14432a;color:var(--ok)}
+  .banner.err{border-color:#4a1a1a;color:var(--err)}
+  .banner.warn{border-color:#4a3a12;color:var(--warn)}
+  .note{font-size:11.5px;color:var(--dim);margin-top:12px;line-height:1.55}
+  a{color:var(--accent);text-decoration:none}
+  code{font-size:11px;color:#a9a9c9;word-break:break-all}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">ZEDEC/ZXV <span>/ TIAMAT</span></div>
+    <div id="who">not connected</div>
+  </header>
+
+  <nav>
+    <button data-tab="dash" class="on">Dashboard</button>
+    <button data-tab="mint">Mint</button>
+    <button data-tab="redeem">Redeem</button>
+    <button data-tab="bridge">Bridge</button>
+    <button data-tab="pool">Pool</button>
+    <button data-tab="wallet">Wallet</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <section class="card" id="dash">
+    <h2>System state</h2>
+    <p class="sub">Read directly from <code>unog.near</code>. No indexer.</p>
+    <div class="row"><span>Total supply</span><b id="d-supply">—</b></div>
+    <div class="row"><span>Curve price</span><b id="d-price">—</b></div>
+    <div class="row"><span>Cap</span><b>144,000,000,000 PQOS</b></div>
+    <div class="row"><span>Decimals</span><b>24</b></div>
+    <div class="row"><span>Admin mint</span><b style="color:var(--ok)">does not exist</b></div>
+    <hr>
+    <div class="row"><span>Ref pool 8992</span><b id="d-pool">—</b></div>
+    <div class="row"><span>Bridge fee</span><b id="d-fee">—</b></div>
+    <div class="note">
+      The core has zero access keys. No admin, no upgrade, no pause.
+      <a href="https://nearblocks.io/address/unog.near" target="_blank" rel="noopener">Verify on-chain</a>.
+    </div>
+  </section>
+
+  <!-- MINT -->
+  <section class="card hide" id="mint">
+    <h2>Mint</h2>
+    <p class="sub">Deposit NEAR, receive TIAMAT at the curve price.</p>
+    <div class="row"><span>Your NEAR</span><b id="m-near">—</b></div>
+    <label for="m-amt">Deposit NEAR</label>
+    <input id="m-amt" type="number" min="0" step="0.1" placeholder="0.0">
+    <div class="row" style="margin-top:12px"><span>You receive ≈</span><b id="m-out">—</b></div>
+    <button class="go" id="m-go">Mint</button>
+    <div class="banner" id="m-msg"></div>
+    <div class="note">Exact output is set on-chain at execution. The curve starts at 1 NEAR per TIAMAT.</div>
+  </section>
+
+  <!-- REDEEM -->
+  <section class="card hide" id="redeem">
+    <h2>Redeem</h2>
+    <p class="sub">Burn TIAMAT, receive a pro-rata slice of the reserve.</p>
+    <div class="row"><span>Your PQOS</span><b id="r-bal">—</b></div>
+    <label for="r-amt">Amount to redeem</label>
+    <input id="r-amt" type="number" min="0" step="0.001" placeholder="0.0">
+    <button class="go" id="r-go">Redeem</button>
+    <div class="banner" id="r-msg"></div>
+    <div class="note">
+      Sends your PQOS to the desk via <code>ft_transfer_call</code>. Settlement is two
+      steps — the burn and the payout. Watch the request, not just the tx hash.
+    </div>
+  </section>
+
+  <!-- BRIDGE -->
+  <section class="card hide" id="bridge">
+    <h2>Bridge</h2>
+    <p class="sub">Lock PQOS on NEAR, mint a capped representation elsewhere.</p>
+    <label for="b-chain">Destination</label>
+    <select id="b-chain">
+      <option value="ethereum">Ethereum</option>
+      <option value="sui">Sui</option>
+      <option value="ton">TON</option>
+      <option value="tron">Tron</option>
+      <option value="aptos">Aptos</option>
+    </select>
+    <label for="b-dest">Recipient address on that chain</label>
+    <input id="b-dest" type="text" placeholder="0x…">
+    <label for="b-amt">Amount PQOS</label>
+    <input id="b-amt" type="number" min="0" step="0.01" placeholder="0.0">
+    <div class="row" style="margin-top:12px"><span>Fee (889 ppm)</span><b id="b-fee">—</b></div>
+    <button class="go" id="b-go">Lock and bridge</button>
+    <div class="banner" id="b-msg"></div>
+    <div class="note">
+      Attested by a 3-of-5 quorum and bounded by an immutable per-chain cap.
+      <strong>Not trustless.</strong> The message is pipe-separated: <code>chain|recipient</code>.
+    </div>
+  </section>
+
+  <!-- POOL -->
+  <section class="card hide" id="pool">
+    <h2>Liquidity</h2>
+    <p class="sub">Ref Finance pool 8992 — PQOS / wNEAR.</p>
+    <div class="row"><span>PQOS in pool</span><b id="p-a">—</b></div>
+    <div class="row"><span>wNEAR in pool</span><b id="p-b">—</b></div>
+    <div class="row"><span>Implied price</span><b id="p-price">—</b></div>
+    <div class="row"><span>Your LP shares</span><b id="p-shares">—</b></div>
+    <hr>
+    <button class="go" id="p-link" style="background:#242438">Open on Ref Finance</button>
+    <div class="note">
+      Your LP position is yours — the shares sit in your wallet and can be withdrawn at
+      any time. Adding liquidity requires both sides in the pool's ratio.
+    </div>
+  </section>
+
+  <!-- WALLET -->
+  <section class="card hide" id="wallet">
+    <h2>Wallet</h2>
+    <p class="sub">Two balances, and the step between them.</p>
+    <div class="row"><span>PQOS (NEP-141 wallet)</span><b id="w-bal">—</b></div>
+    <div class="row"><span>NEAR</span><b id="w-near">—</b></div>
+    <hr>
+    <div class="note" style="color:var(--warn)">
+      <strong>Minting credits an internal GRIDCHAIN account, not this wallet.</strong><br>
+      Your NEP-141 balance above only changes when an <em>export</em> runs. If you mint and
+      see nothing here, the tokens are in the ledger — not lost.
+    </div>
+    <hr>
+    <div class="row"><span>Contract</span><b><code>unog.near</code></b></div>
+    <div class="row"><span>Standard</span><b>NEP-141 ft-1.0.0</b></div>
+    <div class="row"><span>Network</span><b>NEAR mainnet</b></div>
+    <div class="note">
+      <a href="https://nearblocks.io/token/unog.near" target="_blank" rel="noopener">Explorer</a> ·
+      <a href="https://pikespeak.ai/token/unog.near" target="_blank" rel="noopener">Holders</a> ·
+      <a href="https://github.com/sykomiked/zedec-zxv-deployment" target="_blank" rel="noopener">Source &amp; audit</a>
+    </div>
+  </section>
+
+  <div class="note" style="text-align:center;margin-top:16px">
+    Sealed core · zero access keys · no admin mint ·
+    <a href="https://github.com/sykomiked/zedec-zxv-deployment" target="_blank" rel="noopener">verify it yourself</a>
+  </div>
+</div>
+
+<script type="module">
+import { quote, priceAt } from './quote.mjs';
+
+const RPC='https://free.rpc.fastnear.com', CORE='unog.near',
+      DESK='post.jollydragonroger.near', BRIDGE='chiglet.unog.near', DEC=24;
+const $=id=>document.getElementById(id);
+const fmt=(v,d=4)=>(Number(v)/10**DEC).toLocaleString(undefined,{maximumFractionDigits:d});
+const say=(el,k,h)=>{const m=$(el);m.className='banner show '+k;m.innerHTML=h;};
+
+let wallet=null, signedIn=false, supply=0n;
+
+async function rpc(method,params){
+  const r=await fetch(RPC,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});
+  const j=await r.json(); if(j.error) throw new Error(j.error.message||'rpc');
+  return j.result;
+}
+async function view(acct,method,args={}){
+  const r=await rpc('query',{request_type:'call_function',finality:'final',account_id:acct,
+    method_name:method,args_base64:btoa(JSON.stringify(args))});
+  return JSON.parse(new TextDecoder().decode(new Uint8Array(r.result)));
+}
+
+async function loadDash(){
+  try{
+    const s=await view(CORE,'ft_total_supply'); supply=BigInt(s);
+    $('d-supply').textContent=fmt(s,8)+' PQOS';
+    $('d-price').textContent=priceAt(supply).toFixed(6)+' NEAR';
+    try{ const f=await view(BRIDGE,'fee_ppm'); $('d-fee').textContent=f+' ppm'; }catch{ $('d-fee').textContent='889 ppm'; }
+    try{
+      const p=await view('v2.ref-finance.near','get_pool',{pool_id:8992});
+      const a=BigInt(p.amounts[0]), b=BigInt(p.amounts[1]);
+      $('d-pool').textContent=fmt(a,4)+' / '+fmt(b,4)+' wNEAR';
+      $('p-a').textContent=fmt(a,6); $('p-b').textContent=fmt(b,6);
+      $('p-price').textContent=(Number(b)/Number(a)).toFixed(6)+' wNEAR';
+    }catch(e){ $('d-pool').textContent='unavailable'; }
+  }catch(e){ $('d-supply').textContent='read failed'; }
+}
+
+async function loadWallet(){
+  if(!signedIn) return;
+  const a=wallet.account();
+  try{
+    const [b,bal]=await Promise.all([
+      view(CORE,'ft_balance_of',{account_id:a.accountId}),
+      a.getAccountBalance()]);
+    $('w-bal').textContent=fmt(b,6);
+    $('w-near').textContent=(Number(bal.available)/1e24).toFixed(4);
+    $('m-near').textContent=(Number(bal.available)/1e24).toFixed(4);
+    $('r-bal').textContent=fmt(b,6);
+    try{ const sh=await view('v2.ref-finance.near','get_pool_shares',{pool_id:8992,account_id:a.accountId});
+         $('p-shares').textContent=fmt(sh,6); }catch{}
+  }catch(e){}
+}
+
+async function connect(){
+  const {connect:nc,keyStores,WalletConnection}=await import('https://cdn.jsdelivr.net/npm/near-api-js@5/+esm');
+  const near=await nc({networkId:'mainnet',nodeUrl:RPC,walletUrl:'https://wallet.near.org',
+    keyStore:new keyStores.BrowserLocalStorageKeyStore()});
+  wallet=new WalletConnection(near,'zedec-hub');
+  if(!wallet.isSignedIn()) await wallet.requestSignIn({contractId:DESK});
+  signedIn=wallet.isSignedIn();
+  $('who').textContent=wallet.account().accountId;
+  await loadWallet();
+}
+
+async function contract(acct,change,viewm=[]){
+  const {Contract}=await import('https://cdn.jsdelivr.net/npm/near-api-js@5/+esm');
+  return new Contract(wallet.account(),acct,{changeMethods:change,viewMethods:viewm});
+}
+const toYocto=n=>{const {utils}=window.__near||{};
+  return BigInt(Math.round(n*1e6))*10n**18n;};
+
+// MINT
+$('m-amt').addEventListener('input',()=>{
+  const n=Number($('m-amt').value);
+  $('m-out').textContent=n>0?'≈ '+quote(n,supply).toFixed(6)+' PQOS':'—';
+});
+$('m-go').addEventListener('click',async()=>{
+  if(!signedIn) return connect();
+  const n=Number($('m-amt').value); if(!(n>0)) return;
+  $('m-go').disabled=true; $('m-go').textContent='Signing…';
+  try{
+    const {utils}=await import('https://cdn.jsdelivr.net/npm/near-api-js@5/+esm');
+    const d=await contract(DESK,['mint']);
+    const res=await d.mint({},'100000000000000',utils.format.parseNearAmount(String(n)));
+    const id=res?.transaction_outcome?.id||'';
+    say('m-msg','ok',`<strong>Minted.</strong> Deposited ${n} NEAR.`+
+      (id?`<br>Tx <a href="https://nearblocks.io/txns/${id}" target="_blank" rel="noopener"><code>${id}</code></a>`:'')+
+      `<br><br><strong style="color:var(--warn)">Credited to an internal GRIDCHAIN account.</strong> Your wallet balance will not change until export.`);
+    await loadDash(); await loadWallet();
+  }catch(e){ say('m-msg','err','Mint failed: '+(e.message||e)); }
+  finally{ $('m-go').disabled=false; $('m-go').textContent='Mint'; }
+});
+
+// REDEEM
+$('r-go').addEventListener('click',async()=>{
+  if(!signedIn) return connect();
+  const n=Number($('r-amt').value); if(!(n>0)) return;
+  $('r-go').disabled=true; $('r-go').textContent='Signing…';
+  try{
+    const {utils}=await import('https://cdn.jsdelivr.net/npm/near-api-js@5/+esm');
+    const t=await contract(CORE,['ft_transfer_call']);
+    const amt=BigInt(Math.round(n*1e6))*10n**18n;
+    const res=await t.ft_transfer_call({receiver_id:DESK,amount:amt.toString(),msg:''},
+      '150000000000000','1');
+    const id=res?.transaction_outcome?.id||'';
+    say('r-msg','ok','<strong>Redemption requested.</strong>'+
+      (id?`<br>Tx <a href="https://nearblocks.io/txns/${id}" target="_blank" rel="noopener"><code>${id}</code></a>`:'')+
+      '<br><br>Settlement is two steps — the burn, then the payout. Watch the request.');
+  }catch(e){ say('r-msg','err','Redeem failed: '+(e.message||e)); }
+  finally{ $('r-go').disabled=false; $('r-go').textContent='Redeem'; }
+});
+
+// BRIDGE
+$('b-amt').addEventListener('input',()=>{
+  const n=Number($('b-amt').value);
+  $('b-fee').textContent=n>0?(n*0.000889).toFixed(8)+' PQOS':'—';
+});
+$('b-go').addEventListener('click',async()=>{
+  if(!signedIn) return connect();
+  const n=Number($('b-amt').value), dest=$('b-dest').value.trim(), chain=$('b-chain').value;
+  if(!(n>0)||!dest) return say('b-msg','err','Enter an amount and a recipient address.');
+  $('b-go').disabled=true; $('b-go').textContent='Signing…';
+  try{
+    const t=await contract(CORE,['ft_transfer_call']);
+    const amt=BigInt(Math.round(n*1e6))*10n**18n;
+    const res=await t.ft_transfer_call(
+      {receiver_id:BRIDGE,amount:amt.toString(),msg:`${chain}|${dest}`},
+      '150000000000000','1');
+    const id=res?.transaction_outcome?.id||'';
+    say('b-msg','ok','<strong>Locked.</strong> A 3-of-5 attestation will mint on '+chain+'.'+
+      (id?`<br>Tx <a href="https://nearblocks.io/txns/${id}" target="_blank" rel="noopener"><code>${id}</code></a>`:''));
+  }catch(e){ say('b-msg','err','Bridge failed: '+(e.message||e)); }
+  finally{ $('b-go').disabled=false; $('b-go').textContent='Lock and bridge'; }
+});
+
+$('p-link').addEventListener('click',()=>window.open('https://app.ref.finance/#/pools/8992','_blank'));
+
+// TABS
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  ['dash','mint','redeem','bridge','pool','wallet'].forEach(t=>$(t).classList.add('hide'));
+  $(b.dataset.tab).classList.remove('hide');
+}));
+
+loadDash(); loadWallet();
+</script>
+</body>
+</html>

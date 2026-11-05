@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Front-end builders wanted</title>
+<meta name="description" content="The protocol is finished. The interfaces are not. Build one, and charge a fair fee.">
+<style>
+:root{color-scheme:dark;--bg:#08080d;--card:#12121b;--line:#242435;--fg:#e9e9f2;
+--dim:#8b8ba6;--accent:#6366f1;--ok:#4ade80;--warn:#fbbf24;--err:#f87171}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font:15px/1.6 ui-sans-serif,system-ui,sans-serif;
+background:radial-gradient(900px 480px at 50% -10%,#191930 0%,var(--bg) 65%);color:var(--fg);
+display:flex;flex-direction:column;align-items:center;padding:28px 16px}
+.wrap{width:min(720px,100%)}h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--dim);font-size:13px;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:14px}
+h2{font-size:13px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim)}
+.row{display:flex;justify-content:space-between;gap:16px;font-size:13.5px;padding:7px 0;
+border-bottom:1px solid rgba(255,255,255,.04)}.row:last-child{border:0}
+.row span{color:var(--dim);flex:0 0 auto}.row b{font-weight:500;text-align:right;
+font-family:ui-monospace,monospace;word-break:break-all}
+p{margin:0 0 10px;font-size:14px}ul{margin:0;padding-left:18px;font-size:14px}
+li{margin-bottom:6px}code{font-family:ui-monospace,monospace;font-size:12px;color:#b9b9d9;
+background:#0d0d15;padding:2px 6px;border-radius:4px}
+a{color:var(--accent);text-decoration:none}.note{font-size:12px;color:var(--dim);margin-top:12px;line-height:1.6}
+.tag{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:4px;background:#1c1533;
+color:#b9a9e9;margin-left:8px;vertical-align:middle}
+.v{font-family:ui-monospace,monospace;font-size:12px;padding:2px 8px;border-radius:5px;background:#0d2f1d;color:var(--ok)}
+.v.w{background:#3a2e0d;color:var(--warn)}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+nav a{font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;color:var(--dim)}
+nav a:hover{border-color:var(--accent);color:var(--fg)}
+</style></head><body><div class="wrap">
+<h1>Front-end builders wanted<span class="tag">BUILDERS</span></h1><p class="sub">The protocol is finished. The interfaces are not. Build one, and charge a fair fee.</p>
+<nav><a href="/">Hub</a><a href="/quantum/">Quantum</a><a href="/kernel/">Kernel</a><a href="/scp144/">SCP-144</a><a href="/zedei/">zedei</a><a href="/unog/">unog</a><a href="/bridge/">Bridge</a><a href="/governance/">Governance</a><a href="/outposts/">Outposts</a><a href="/logic/">Logic</a><a href="/builders/">Builders</a><a href="/ledger/">Ledger</a></nav>
+<section class="card"><h2>What we need</h2><div class="row"><span>1 · Mint desk</span><b>deposit NEAR, receive TIAMAT — low</b></div><div class="row"><span>2 · Redeem desk</span><b>send TIAMAT, receive a reserve slice — low</b></div><div class="row"><span>3 · Bridge</span><b>lock PQOS, track attestation and mint — medium</b></div><div class="row"><span>4 · Pool / swap</span><b>internal AMM plus the Ref pair — medium</b></div><div class="row"><span>5 · Dashboard</span><b>supply, reserve, curve, holders, fee — low</b></div><div class="row"><span>6 · Wallet</span><b>internal ledger vs NEP-141, and the export step — medium</b></div><p class="note">Start with #1 and #6 together. The most common confusion is that minting credits an internal account and a separate export moves it to a wallet.</p></section>
+<section class="card"><h2>You may charge a fee</h2><p><strong>Yes. Take a fair, minimal fee out of the transaction flow.</strong></p>
+  <p>Two clean ways: wrap the action in your own contract and show the fee on the confirmation
+  screen, or charge for the interface itself rather than the transaction.</p>
+  <p>What we ask: state the fee before the user signs, keep it minimal, and never take it out of
+  collateral or out of a redemption someone is depending on.</p>
+  <p class="note">We will not take a cut, we cannot revoke you, and there is no gate to pass — the
+  core has no owner to ask.</p></section>
+<section class="card"><h2>Build against this</h2><p><code>unog.near.ft_metadata</code> → decimals <strong>24</strong>, not 18.<br>
+  <code>unog.near.ft_total_supply</code> → base units.<br>
+  <code>unog.near.ft_balance_of({account_id})</code> → your balance.<br>
+  <code>chiglet.unog.near.fee_ppm</code> → <code>889</code>.</p>
+  <p class="note">The repository carries a working reference client — the relayer — which reads
+  state, builds payloads, signs, submits and confirms. If a call shape is unclear, that file is the answer.</p></section>
+<p class="note" style="text-align:center;margin-top:20px">
+Sealed core · zero access keys · <a href="https://github.com/sykomiked/zedec-zxv-deployment" target="_blank" rel="noopener">verify the source</a>
+</p></div></body></html>
